@@ -1,6 +1,9 @@
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('postgres://localhost/acme-react-redux')
-
+const express = require('express');
+const app = express();
+const path = require('path');
+const PORT = 8080;
 
 const InventoryItem = sequelize.define('item', {
     name: {
@@ -17,10 +20,29 @@ const InventoryItem = sequelize.define('item', {
 })
 
 
+app.get('/', (req, res, next) => {
+    res.sendFile(path.join(__dirname, "..index.html"))
+})
+
+//app.use(express.static(path.join(__dirname,"..", "Public")))
+
+app.get('/api/products', async(req, res, next) => {
+    try{
+        res.send(await InventoryItem.findAll());
+    }
+    catch(e){
+        next(e);
+    }
+})
+
+
 
 const start = async() =>{
     try{
         await sequelize.sync({force:true})
+        app.listen(PORT, () => {
+            console.log('listening on port ', PORT)
+        })
         await InventoryItem.create({name: 'Foo', stockCount: 0});
         await InventoryItem.create({name: "Bar", stockCount: 0});
         await InventoryItem.create({name: 'Baz', stockCount: 0})
