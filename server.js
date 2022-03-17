@@ -3,7 +3,7 @@ const sequelize = new Sequelize('postgres://localhost/acme-react-redux')
 const express = require('express');
 const app = express();
 const path = require('path');
-const PORT = 8080;
+const PORT = process.env.PORT || 3000;
 
 const InventoryItem = sequelize.define('item', {
     name: {
@@ -20,11 +20,9 @@ const InventoryItem = sequelize.define('item', {
 })
 
 
-app.get('/', (req, res, next) => {
-    res.sendFile(path.join(__dirname, "..index.html"))
-})
+app.use('/dist', express.static(path.join(__dirname, 'dist')));
+app.get('/', (req, res)=> res.sendFile(path.join(__dirname, 'index.html')));
 
-//app.use(express.static(path.join(__dirname,"..", "Public")))
 
 app.get('/api/products', async(req, res, next) => {
     try{
